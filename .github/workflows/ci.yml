@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: checks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install desktop and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk python3-venv xvfb xauth
+          python3 -m venv --system-site-packages .venv
+          .venv/bin/python -m pip install build ruff
+      - name: Lint and import
+        run: |
+          .venv/bin/ruff check .
+          .venv/bin/python -c 'import woeusb_gui.app, woeusb_gui.helper'
+      - name: Test including the GUI
+        run: xvfb-run -a .venv/bin/python -m unittest discover -v
+      - name: Build distribution
+        run: .venv/bin/python -m build
+
+  test:
+    name: test
+    if: always()
+    needs: checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require all platform checks
+        run: test "${{ needs.checks.result }}" = success

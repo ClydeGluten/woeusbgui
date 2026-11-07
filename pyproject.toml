@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "woeusb-simple-gui"
+version = "0.1.0"
+description = "A lightweight Linux desktop front end for WoeUSB with USB drive detection"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: X11 Applications",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Installation/Setup",
+]
+
+[project.gui-scripts]
+woeusb-gui = "woeusb_gui.app:main"
+
+[tool.setuptools.packages.find]
+include = ["woeusb_gui*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
